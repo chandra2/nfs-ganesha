@@ -245,6 +245,12 @@ void nfs_print_param_config()
     printf("\tDrop_Inval_Errors = TRUE ; \n");
   else
     printf("\tDrop_Inval_Errors = FALSE ;\n");
+
+  if(nfs_param.core_param.drop_delay_errors)
+    printf("\tDrop_Delay_Errors = TRUE ; \n");
+  else
+    printf("\tDrop_Delay_Errors = FALSE ;\n");
+
   printf("}\n\n");
 
   printf("NFS_Worker_Param\n{\n");
@@ -299,6 +305,7 @@ void nfs_set_param_default()
 #endif
   nfs_param.core_param.drop_io_errors = TRUE;
   nfs_param.core_param.drop_inval_errors = FALSE;
+  nfs_param.core_param.drop_delay_errors = TRUE;
   nfs_param.core_param.core_dump_size = 0;
   nfs_param.core_param.nb_max_fd = -1;       /* Use OS's default */
   nfs_param.core_param.stats_update_delay = 60;
@@ -682,6 +689,7 @@ int nfs_set_param_from_conf(nfs_start_info_t * p_start_info)
   cache_content_status_t cache_content_status;
 
 #ifdef _USE_SHARED_FSAL
+  unsigned int i = 0 ;
   unsigned int saved_fsalid = 0 ;
   unsigned int fsalid = 0 ;
   unsigned int i = 0 ;

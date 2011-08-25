@@ -50,7 +50,7 @@ GA_PROG_DOXYGEN
 # define everything necessary for accessing large files (64bits offset)
 AC_SYS_LARGEFILE
 
-CFLAGS="$CFLAGS -D_REENTRANT"
+CFLAGS="$CFLAGS -D_REENTRANT -Wall -Wimplicit -Wformat -Wmissing-braces -Wno-pointer-sign"
 
 # Version number for shared object
 LIBVERSION=`echo $VERSION | sed -e 's/\./:/g'`
@@ -328,7 +328,7 @@ GA_ENABLE_FLAG(  [debug-symbols],	 [include debug symbols to binaries (-g option
 GA_ENABLE_FLAG( [profiling], [turn on code profiling (-g and -pg)], [-g -pg] )
 
 # enable code profiling
-GA_ENABLE_FLAG( [strict-compile], [turn on strict compiler flags], [-Werror -Wimplicit -Wformat -Wmissing-braces -Wreturn-type -Wunused-variable -Wuninitialized] )
+GA_ENABLE_FLAG( [strict-compile], [turn on strict compiler flags], [-Werror -Wformat -Wmissing-braces -Wreturn-type -Wunused-variable -Wuninitialized] )
 
 # NFSv4 ACL
 GA_ENABLE_AM_CONDITION([nfs4-acl],[disable NFSv4 ACL support],[USE_NO_NFS4_ACL])
@@ -349,7 +349,7 @@ if test "${with_extra_includedir+set}" == "set"; then
 fi
 
 # FSAL switch argument (default is PROXY)
-AC_ARG_WITH( [fsal], AS_HELP_STRING([--with-fsal=HPSS|POSIX|PROXY|SNMP|GHOSTFS|FUSE|LUSTRE|XFS|GPFS|ZFS|VFS|DYNFSAL (default=PROXY)],[specify the type of filesystem to be exported] ),
+AC_ARG_WITH( [fsal], AS_HELP_STRING([--with-fsal=HPSS|POSIX|PROXY|SNMP|GHOSTFS|FUSE|LUSTRE|XFS|GPFS|ZFS|VFS|DYNFSAL|SHOOK (default=PROXY)],[specify the type of filesystem to be exported] ),
 	     FSAL="$withval", FSAL="PROXY")
 
 # exporting USE_FSAL_... for conditional compilation
@@ -360,6 +360,7 @@ AM_CONDITIONAL(USE_FSAL_PROXY,    test "$FSAL" = "PROXY")
 AM_CONDITIONAL(USE_FSAL_SNMP,     test "$FSAL" = "SNMP")
 AM_CONDITIONAL(USE_FSAL_FUSE,     test "$FSAL" = "FUSE")
 AM_CONDITIONAL(USE_FSAL_LUSTRE,   test "$FSAL" = "LUSTRE")
+AM_CONDITIONAL(USE_FSAL_LUSTRE,   test "$FSAL" = "SHOOK") # variant of Lustre FSAL
 AM_CONDITIONAL(USE_FSAL_XFS,      test "$FSAL" = "XFS")
 AM_CONDITIONAL(USE_FSAL_GPFS,     test "$FSAL" = "GPFS")
 AM_CONDITIONAL(USE_FSAL_TEMPLATE, test "$FSAL" = "TEMPLATE")
@@ -536,11 +537,29 @@ case $FSAL in
 			AC_DEFINE([_LUSTRE_HSM], 1, [Lustre version supports HSM binding])
 		fi
 
-		FSAL_CFLAGS=
-                FSAL_LDFLAGS="-llustreapi"
-		FSAL_LIB="\$(top_builddir)/FSAL/FSAL_LUSTRE/libfsallustre.la"
+        FSAL_CFLAGS=
+        FSAL_LDFLAGS="-llustreapi"
+        FSAL_LIB="\$(top_builddir)/FSAL/FSAL_LUSTRE/libfsallustre.la"
 		FS_NAME="lustre"
 		;;
+
+    SHOOK)
+        # Lustre FSAL compiled with special compilation directives
+        AC_CHECK_LIB([shooksvr], [shook_restore],, AC_MSG_ERROR([libshooksvr not found]))
+        AC_DEFINE(_SHOOK, 1, [shook is enabled])
+
+		AC_CHECK_HEADERS([attr/xattr.h], [], [AC_MSG_ERROR(missing xattr header files)])
+		AC_CHECK_LIB([lustreapi], [llapi_fid2path], [have_lustre2_api="yes"])
+		if test "x$have_lustre2_api" != "xyes" ; then
+	            AC_MSG_ERROR([Lustre 2.x and liblustreapi are required])
+		fi
+		AC_DEFINE([_USE_LUSTRE], 1, [GANESHA exports Lustre Filesystem])
+        FSAL_CFLAGS=
+        FSAL_LDFLAGS="-lshooksvr -llustreapi"
+        FSAL_LIB="\$(top_builddir)/FSAL/FSAL_LUSTRE/libfsallustre.la"
+		FS_NAME="shook"
+        ;;
+
 	XFS)
 		AC_DEFINE([_USE_XFS], 1, [GANESHA exports XFS Filesystem])
  		AC_CHECK_HEADERS([xfs/xfs.h], [], [AC_MSG_ERROR( missing xfs include files)])
@@ -567,10 +586,21 @@ case $FSAL in
 		AC_DEFINE([_USE_GPFS], 1, [GANESHA exports GPFS Filesystem])
 		AC_CHECK_HEADERS([gpfs_nfs.h], [], [AC_MSG_ERROR(missing gpfs include files)])
 		AC_CHECK_DECL([gpfs_ganesha], [], [AC_MSG_ERROR(missing gpfs_ganesha function)], [[#include <gpfs_nfs.h>]])
-		AC_CHECK_DECLS([OPENHANDLE_NAME_TO_HANDLE, OPENHANDLE_OPEN_BY_HANDLE, OPENHANDLE_LINK_BY_FD,
-		                OPENHANDLE_READLINK_BY_FD, OPENHANDLE_STAT_BY_HANDLE],
+		AC_CHECK_DECLS([OPENHANDLE_NAME_TO_HANDLE, 
+                                OPENHANDLE_OPEN_BY_HANDLE,
+                                OPENHANDLE_LINK_BY_FD,
+		                OPENHANDLE_READLINK_BY_FD,
+                                OPENHANDLE_STAT_BY_HANDLE, 
+                                XATTR_STAT,
+                                XATTR_MODE,
+                                XATTR_UID,
+                                XATTR_GID,
+                                XATTR_ATIME_SET,
+                                XATTR_MTIME_SET,
+                                XATTR_ACL
+                                ],
 		               [],
-		               [AC_MSG_ERROR(missing Open By Handle function)],
+		               [AC_MSG_ERROR(GPFS < 3.5.0 found, you must upgrade GPFS to use this feature)],
 		               [[#include <gpfs_nfs.h>]])
 		if [[  $PNFS != "NONE" ]] ; then
 			AC_CHECK_DECLS([OPENHANDLE_LAYOUT_TYPE, OPENHANDLE_GET_DEVICEINFO, OPENHANDLE_GET_DEVICEITER,
@@ -591,16 +621,6 @@ case $FSAL in
                 FSAL_LDFLAGS=""
 		FSAL_LIB="\$(top_builddir)/FSAL/FSAL_VFS/libfsalvfs.la"
 		FS_NAME="vfs"
-		# Check for kernel version (should be at least 2.6.39)
-		if test `uname -r |cut -d. -f1` -lt 2 ; then
-		 AC_MSG_ERROR(Kernel is too old to handle open_by_handle)
-                fi
-		if test `uname -r |cut -d. -f2` -lt 6 ; then 
-		 AC_MSG_ERROR(Kernel is too old to handle open_by_handle)
-		fi
-		if test `uname -r |cut -d. -f3 | cut -d- -f1` -lt 39 ; then
-		 AC_MSG_ERROR(Kernel is too old to handle open_by_handle)
-		fi
 		;;
         ZFS)
                 AC_DEFINE([_USE_ZFS], 1, [GANESHA exports ZFS Filesystem])
@@ -648,9 +668,9 @@ case $FSAL in
 				"7."*)
 					AC_DEFINE([_USE_PGSQL], 1, [Using PostgreSQL database])
 					;;
-				"8."*)
+				"8."*|"9."*)
 					AC_DEFINE([_USE_PGSQL], 1, [Using PostgreSQL database])
-					AC_DEFINE([_PGSQL8], 1, [Using PostgreSQL version 8.x])
+					AC_DEFINE([_PGSQL8], 1, [Using PostgreSQL version >= 8.x])
 					;;
 				*)
 					AC_MSG_ERROR("Unsupported PostgreSQL version: $PGSQL_VERSION")

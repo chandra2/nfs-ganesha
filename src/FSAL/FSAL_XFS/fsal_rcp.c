@@ -51,8 +51,8 @@ char *strcat(char *dest, const char *src);
  *        - Another error code if an error occured.
  */
 
-fsal_status_t XFSFSAL_rcp(xfsfsal_handle_t * filehandle,        /* IN */
-                          xfsfsal_op_context_t * p_context,     /* IN */
+fsal_status_t XFSFSAL_rcp(fsal_handle_t * filehandle,        /* IN */
+                          fsal_op_context_t * p_context,     /* IN */
                           fsal_path_t * p_local_path,   /* IN */
                           fsal_rcpflag_t transfer_opt   /* IN */
     )
@@ -190,7 +190,7 @@ fsal_status_t XFSFSAL_rcp(xfsfsal_handle_t * filehandle,        /* IN */
       LogFullDebug(COMPONENT_FSAL, "Openning FSAL file with flags: %s", msg);
     }
 
-  st = XFSFSAL_open(filehandle, p_context, fs_flags, &fs_fd, NULL);
+  st = XFSFSAL_open(filehandle, p_context, fs_flags, (fsal_file_t *)&fs_fd, NULL);
 
   if(FSAL_IS_ERROR(st))
     {
@@ -210,7 +210,7 @@ fsal_status_t XFSFSAL_rcp(xfsfsal_handle_t * filehandle,        /* IN */
     {
       /* clean & return */
       close(local_fd);
-      XFSFSAL_close(&fs_fd);
+      XFSFSAL_close((fsal_file_t *)&fs_fd);
       Return(ERR_FSAL_NOMEM, Mem_Errno, INDEX_FSAL_rcp);
     }
 
@@ -242,7 +242,7 @@ fsal_status_t XFSFSAL_rcp(xfsfsal_handle_t * filehandle,        /* IN */
       else                      /* from FSAL filesystem */
         {
           fs_size = 0;
-          st = XFSFSAL_read(&fs_fd, NULL, RCP_BUFFER_SIZE, IObuffer, &fs_size, &eof);
+          st = XFSFSAL_read((fsal_file_t *)&fs_fd, NULL, RCP_BUFFER_SIZE, IObuffer, &fs_size, &eof);
 
           if(FSAL_IS_ERROR(st))
             break;              /* exit loop */
@@ -261,7 +261,7 @@ fsal_status_t XFSFSAL_rcp(xfsfsal_handle_t * filehandle,        /* IN */
           if(to_fs)             /* to FSAL filesystem */
             {
 
-              st = XFSFSAL_write(&fs_fd, NULL, local_size, IObuffer, &fs_size);
+              st = XFSFSAL_write((fsal_file_t *)&fs_fd, NULL, local_size, IObuffer, &fs_size);
 
               if(FSAL_IS_ERROR(st))
                 break;          /* exit loop */
@@ -294,7 +294,7 @@ fsal_status_t XFSFSAL_rcp(xfsfsal_handle_t * filehandle,        /* IN */
 
   Mem_Free(IObuffer);
   close(local_fd);
-  XFSFSAL_close(&fs_fd);
+  XFSFSAL_close((fsal_file_t *)&fs_fd);
 
   /* return status. */
 
@@ -302,9 +302,9 @@ fsal_status_t XFSFSAL_rcp(xfsfsal_handle_t * filehandle,        /* IN */
 
 }
 
-fsal_status_t XFSFSAL_rcp_by_fileid(xfsfsal_handle_t * filehandle,      /* IN */
+fsal_status_t XFSFSAL_rcp_by_fileid(fsal_handle_t * filehandle,      /* IN */
                                     fsal_u64_t fileid,  /* IN */
-                                    xfsfsal_op_context_t * p_context,   /* IN */
+                                    fsal_op_context_t * p_context,   /* IN */
                                     fsal_path_t * p_local_path, /* IN */
                                     fsal_rcpflag_t transfer_opt /* IN */ )
 {
