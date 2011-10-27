@@ -397,7 +397,7 @@ int nfs4_op_readdir(struct nfs_argop4 *op,
                  NFS4_VERIFIER_SIZE);
         }
      
-      printf( "--- MaxCount=%u  OutBuffSize=%u ---\n", maxcount, outbuffsize ) ;
+      printf( "--- MaxCount=%lu  OutBuffSize=%u ---\n", maxcount, outbuffsize ) ;
       printf( "------ EOF=%u------------\n", res_READDIR4.READDIR4res_u.resok4.reply.eof  ) ;
 
 
