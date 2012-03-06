@@ -430,6 +430,7 @@ static int op_dsread(struct nfs_argop4 *op,
 {
   /* The FSAL file handle */
   fsal_handle_t handle;
+  struct fsal_handle_desc fh_desc;
   /* NFSv4 return code */
   nfsstat4 nfs_status = 0;
   /* Buffer into which data is to be read */
@@ -453,12 +454,15 @@ static int op_dsread(struct nfs_argop4 *op,
   /* Construct the FSAL file handle */
 
   if ((nfs4_FhandleToFSAL(&data->currentFH,
-                          &handle,
+                          &fh_desc,
                           data->pcontext)) == 0)
     {
       res_READ4.status = NFS4ERR_INVAL;
       return res_READ4.status;
     }
+
+  memset(&handle, 0, sizeof(handle));
+  memcpy(&handle, fh_desc.start, fh_desc.len);
 
   /*
    * Allocate the memory for the read buffer to be page-aligned if we
