@@ -220,9 +220,10 @@ int cache_inode_compare_key_fsal(hash_buffer_t * buff1, hash_buffer_t * buff2)
       else
         {
           int rc;
+printf("JV: cache_inode_compare_key_fsal  buff1:%p buff1->len:%d buff2:%p buff2->len:%d\n", buff1, (int)buff1->len, buff2, (int)buff2->len);
 
           rc = (buff1->len == buff2->len &&
-		!memcmp(buff1->pdata, buff2->pdata, buff1->len)) ? 0 : 1;
+		!FSAL_handlecmp((fsal_handle_t *)buff1->pdata, (fsal_handle_t *)buff2->pdata, &status)) ? 0 : 1;
 
           return rc;
         }
@@ -428,7 +429,7 @@ cache_entry_t *cache_inode_new_entry(cache_inode_fsal_data_t   * pfsdata,
   memcpy(&pentry->handle,
 	 pfsdata->fh_desc.start,
 	 pfsdata->fh_desc.len);
-  pentry->fh_desc.start = &pentry->handle;
+  pentry->fh_desc.start = (caddr_t)&pentry->handle;
   pentry->fh_desc.len = pfsdata->fh_desc.len;
 
 #ifdef _USE_MFSL
@@ -1182,7 +1183,7 @@ fsal_handle_t *cache_inode_get_fsal_handle(cache_entry_t * pentry,
           *pstatus = CACHE_INODE_SUCCESS;
          }                       /* switch( pentry->internal_md.type ) */
     }
-  if(pentry->fh_desc.start != &pentry->handle)
+  if(pentry->fh_desc.start != (caddr_t) &pentry->handle)
     {
       LogCrit(COMPONENT_CACHE_INODE,
 	      "Mangled handle descriptor: "

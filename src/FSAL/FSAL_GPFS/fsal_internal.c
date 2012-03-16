@@ -532,12 +532,14 @@ fsal_status_t fsal_internal_get_handle(fsal_op_context_t * p_context,   /* IN */
   harg.name = p_fsalpath->path;
   harg.dfd = AT_FDCWD;
   harg.flag = 0;
-
+printf("fsal_internal_get_handle 1: version: %d  type: %d\n", harg.handle->handle_version, harg.handle->handle_type);
   LogFullDebug(COMPONENT_FSAL,
                "Lookup handle for %s",
                p_fsalpath->path);
 
   rc = gpfs_ganesha(OPENHANDLE_NAME_TO_HANDLE, &harg);
+
+printf("fsal_internal_get_handle 2: version: %d  type: %d\n", harg.handle->handle_version, harg.handle->handle_type);
 
   if(rc < 0)
     ReturnCode(posix2fsal_error(errno), errno);
@@ -584,8 +586,10 @@ fsal_status_t fsal_internal_get_handle_at(int dfd,      /* IN */
                "Lookup handle at for %s",
                p_fsalname->name);
 
+printf("fsal_internal_get_handle_at 1: version: %d  type: %d\n", harg.handle->handle_version, harg.handle->handle_type);
   rc = gpfs_ganesha(OPENHANDLE_NAME_TO_HANDLE, &harg);
 
+printf("fsal_internal_get_handle_at 2: version: %d  type: %d\n", harg.handle->handle_version, harg.handle->handle_type);
   if(rc < 0)
     ReturnCode(posix2fsal_error(errno), errno);
 
@@ -625,9 +629,11 @@ fsal_status_t fsal_internal_fd2handle(int fd, fsal_handle_t * handle)
   LogFullDebug(COMPONENT_FSAL,
                "Lookup handle by fd for %d",
                fd);
+printf("fsal_internal_fd2handle 1: version: %d  type: %d\n", harg.handle->handle_version, harg.handle->handle_type);
 
   rc = gpfs_ganesha(OPENHANDLE_NAME_TO_HANDLE, &harg);
 
+printf("fsal_internal_fd2handle 2: version: %d  type: %d\n", harg.handle->handle_version, harg.handle->handle_type);
   if(rc < 0)
     ReturnCode(posix2fsal_error(errno), errno);
 

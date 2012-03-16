@@ -60,9 +60,20 @@ fsal_status_t GPFSFSAL_UP_GetEvents( fsal_up_event_t ** pevents,                
   struct glock fl;
   struct callback_arg callback;
   cache_inode_fsal_data_t pfsal_data;
-  gpfsfsal_handle_t *phandle = (gpfsfsal_handle_t *) &pfsal_data.handle;
+  fsal_handle_t *tmp_handlep;
+  //fsal_handle_t tmp_handle;
+  gpfsfsal_handle_t *phandle;
   int reason = 0;
   unsigned int *fhP;
+
+  tmp_handlep = malloc(sizeof(fsal_handle_t));
+  memset((char *)tmp_handlep, 0, sizeof(fsal_handle_t)) ;
+
+  memset((char *)&pfsal_data, 0, sizeof(pfsal_data));
+  pfsal_data.fh_desc.start = (caddr_t)tmp_handlep;
+  pfsal_data.fh_desc.len = sizeof(*tmp_handlep);
+printf("1st.. tmp_handlep:%p, size:%d\n",pfsal_data.fh_desc.start, (int)pfsal_data.fh_desc.len);
+  phandle = (gpfsfsal_handle_t *) pfsal_data.fh_desc.start;
 
   if (pupebcontext == NULL || event_nb == NULL)
     {
@@ -71,12 +82,10 @@ fsal_status_t GPFSFSAL_UP_GetEvents( fsal_up_event_t ** pevents,                
       Return(ERR_FSAL_INVAL, 0, INDEX_FSAL_UP_getevents);
     }
 
-  memset(&pfsal_data, 0, sizeof(cache_inode_fsal_data_t));
 
   gpfsfsal_export_context_t *p_export_context =
     (gpfsfsal_export_context_t *)&pupebcontext->FS_export_context;
 
-  pfsal_data.cookie = 0;
   phandle->data.handle.handle_size = OPENHANDLE_HANDLE_LEN;
   phandle->data.handle.handle_key_size = 0;
   callback.mountdirfd = p_export_context->mount_root_fd;
@@ -90,12 +99,25 @@ fsal_status_t GPFSFSAL_UP_GetEvents( fsal_up_event_t ** pevents,                
            "inode update: rc %d reason %d update ino %ld",
            rc, reason, callback.buf->st_ino);
   LogDebug(COMPONENT_FSAL,
-           "inode update: handle size = %u key_size = %u",
+           "inode update: tmp_handlep:%p callback.handle:%p  pfsal_data.fh_desc.start:%p handle size = %u handle_type:%d handle_version:%d key_size = %u f_handle:%p", tmp_handlep, callback.handle, pfsal_data.fh_desc.start,
            callback.handle->handle_size,
-           callback.handle->handle_key_size);
+           callback.handle->handle_type,
+           callback.handle->handle_version,
+           callback.handle->handle_key_size,
+           callback.handle->f_handle);
+           printf("inode update: tmp_handlep:%p callback.handle:%p  pfsal_data.fh_desc.start:%p handle size = %u handle_type:%d handle_version:%d key_size = %u f_handle:%p", tmp_handlep, callback.handle, pfsal_data.fh_desc.start,
+           callback.handle->handle_size,
+           callback.handle->handle_type,
+           callback.handle->handle_version,
+           callback.handle->handle_key_size,
+           callback.handle->f_handle);
+  callback.handle->handle_type = 7;
+  callback.handle->handle_version = 1;
   fhP = (int *)&(callback.handle->f_handle[0]);
   LogDebug(COMPONENT_FSAL,
            " inode update: handle %08x %08x %08x %08x %08x %08x %08x\n",
+           fhP[0],fhP[1],fhP[2],fhP[3],fhP[4],fhP[5],fhP[6]);
+   printf(" inode update: handle %08x %08x %08x %08x %08x %08x %08x\n",
            fhP[0],fhP[1],fhP[2],fhP[3],fhP[4],fhP[5],fhP[6]);
 
   /* Here is where we decide what type of event this is
@@ -103,9 +125,17 @@ fsal_status_t GPFSFSAL_UP_GetEvents( fsal_up_event_t ** pevents,                
   if (*pevents == NULL)
     GetFromPool(*pevents, pupebcontext->event_pool, fsal_up_event_t);
   memset(*pevents, 0, sizeof(fsal_up_event_t));
-  memcpy(&(*pevents)->event_data.event_context.fsal_data, &pfsal_data,
-         sizeof(cache_inode_fsal_data_t));
+  {
+  cache_inode_fsal_data_t *event_fsal_data = &(*pevents)->event_data.event_context.fsal_data;
+  memcpy(event_fsal_data, &pfsal_data, sizeof(cache_inode_fsal_data_t));
+  event_fsal_data->fh_desc.len = gpfs_sizeof_handle((struct file_handle *)event_fsal_data->fh_desc.start);
+  }
 
+  //memcpy(tmp_handlep, pfsal_data.fh_desc.start, callback.handle->handle_size);
+ printf("start:%p len:%d\n", (*pevents)->event_data.event_context.fsal_data.fh_desc.start, (int)(*pevents)->event_data.event_context.fsal_data.fh_desc.len); 
+ // (*pevents)->event_data.event_context.fsal_data.fh_desc.start = (caddr_t)tmp_handlep;
+  //(*pevents)->event_data.event_context.fsal_data.fh_desc.len = callback.handle->handle_size;
+  
   if (reason == INODE_LOCK_GRANTED) /* Lock Event */
     {
       LogDebug(COMPONENT_FSAL,

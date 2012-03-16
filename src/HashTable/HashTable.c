@@ -343,6 +343,7 @@ static int Key_Locate(hash_table_t * ht, hash_buffer_t * buffkey, unsigned int h
   /* Find was successfull ? */
   if(pn == NULL)
     {
+printf("JV: Key_Locate: pn==NULL\n");
       LogFullDebug(COMPONENT_HASHTABLE,
                    "Returning HASHTABLE_ERROR_NO_SUCH_KEY because pn == NULL, rbtval = %u", rbt_value);
       return HASHTABLE_ERROR_NO_SUCH_KEY;
@@ -352,9 +353,11 @@ static int Key_Locate(hash_table_t * ht, hash_buffer_t * buffkey, unsigned int h
   while((pn != 0) && (RBT_VALUE(pn) == rbt_value))
     {
       pdata = (hash_data_t *) RBT_OPAQ(pn);
+printf("JV: pdata:%p\n", pdata);
       /* Verify the key value : this function returns 0 if key are indentical */
       if(!ht->parameter.compare_key(buffkey, &(pdata->buffkey)))
         {
+printf("JV: FOUND\n");
           found = 1;
           break;                /* exit the while loop */
         }
@@ -364,6 +367,7 @@ static int Key_Locate(hash_table_t * ht, hash_buffer_t * buffkey, unsigned int h
   /* We didn't find anything */
   if(!found)
     {
+printf("JV: NOT found\n");
       LogFullDebug(COMPONENT_HASHTABLE,
                    "Returning HASHTABLE_ERROR_NO_SUCH_KEY because not found");
       return HASHTABLE_ERROR_NO_SUCH_KEY;
@@ -720,11 +724,13 @@ int HashTable_GetRef(hash_table_t * ht, hash_buffer_t * buffkey, hash_buffer_t *
 
      hashval   = (unsigned long) hashval32;
      rbt_value = (unsigned long) rbt_value32;
+printf("JV in hash_func_both; func:%p, hashval:%lu rbt_val:%lu\n", ht->parameter.hash_func_both, hashval, rbt_value);
    }
   else
    {
     hashval   = (*(ht->parameter.hash_func_key)) (&ht->parameter, buffkey);
     rbt_value = (*(ht->parameter.hash_func_rbt)) (&ht->parameter, buffkey);
+printf("JV in else; hfunc:%p rbtfunc:%p, hashval:%lu rbt_val:%lu\n", ht->parameter.hash_func_key, ht->parameter.hash_func_rbt, hashval, rbt_value);
    }
 
   /* Acquire mutex */
@@ -735,6 +741,7 @@ int HashTable_GetRef(hash_table_t * ht, hash_buffer_t * buffkey, hash_buffer_t *
     {
       ht->stat_dynamic[hashval].notfound.nb_get += 1;
       V_r(&(ht->array_lock[hashval]));
+printf("JV Key_Locate failed rc:%d\n", rc);
       return rc;
     }
 

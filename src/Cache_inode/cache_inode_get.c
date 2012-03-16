@@ -120,7 +120,6 @@ cache_entry_t *cache_inode_get_located(cache_inode_fsal_data_t * pfsdata,
   cache_inode_file_type_t type;
   int hrc = 0;
   fsal_attrib_list_t fsal_attributes;
-  cache_inode_fsal_data_t *ppoolfsdata = NULL;
   fsal_handle_t *pfile_handle;
 
   memset(&create_arg, 0, sizeof(create_arg));
@@ -137,9 +136,17 @@ cache_entry_t *cache_inode_get_located(cache_inode_fsal_data_t * pfsdata,
 
   /* Turn the input to a hash key on our own.
    */
+//  pfsdata->fh_desc.len = 40;
   key.pdata = pfsdata->fh_desc.start;
-  key.len == pfsdata->fh_desc.len;
-
+  key.len = pfsdata->fh_desc.len;
+  printf("cache_inode_get: JV: key.pdata:%p  key.len:%d\n", key.pdata, (int)key.len);
+{
+  struct file_handle * jv_handle = (struct file_handle * )pfsdata->fh_desc.start;
+  printf("cache_inode_get: JV: handle_size:%d handle_type:%d handle_version:%d handle_key_size:%d f_handle:%p\n", jv_handle->handle_size,jv_handle->handle_type, jv_handle->handle_version, jv_handle->handle_key_size, jv_handle->f_handle);
+ int *fhP = (int *)&(jv_handle->f_handle[0]);
+  printf(" inode update: handle %08x %08x %08x %08x %08x %08x %08x\n",
+           fhP[0],fhP[1],fhP[2],fhP[3],fhP[4],fhP[5],fhP[6]);
+}
   hrc = HashTable_Get(ht, &key, &value);
   switch (hrc)
     {
@@ -160,6 +167,7 @@ cache_entry_t *cache_inode_get_located(cache_inode_fsal_data_t * pfsdata,
     case HASHTABLE_ERROR_NO_SUCH_KEY:
       if ( !pclient ) {
 	/* invalidate. Just return */
+        LogEvent(COMPONENT_CACHE_INODE, "JV: HashTable_Get failed: ht:%p \n", ht);
 	return( NULL );
       }
       /* Cache miss, allocate a new entry */
