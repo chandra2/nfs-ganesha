@@ -51,6 +51,7 @@ int FSAL_name2fsalid( char * fsname )
    else if( !strncasecmp( fsname, "POSIX",    MAXNAMLEN ) ) return FSAL_POSIX_ID ;
    else if( !strncasecmp( fsname, "VFS",      MAXNAMLEN ) ) return FSAL_VFS_ID ;
    else if( !strncasecmp( fsname, "GPFS",     MAXNAMLEN ) ) return FSAL_GPFS_ID ;
+   else if( !strncasecmp( fsname, "PT",       MAXNAMLEN ) ) return FSAL_PT_ID ;
    else if( !strncasecmp( fsname, "PROXY",    MAXNAMLEN ) ) return FSAL_PROXY_ID ;
    else if( !strncasecmp( fsname, "XFS",      MAXNAMLEN ) ) return FSAL_XFS_ID ;
    else return -1 ;

@@ -9,7 +9,7 @@ AC_SUBST(RELEASE, [1])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_HEADER([include/config.h])
 AC_CONFIG_MACRO_DIR([m4])
-AC_REVISION([Compiles:  i386/x86_64. FSAL: POSIX/PROXY/HPSS/FUSELIKE/LUSTRE/XFS/GPFS/ZFS/VFS/CEPH .xattr ghost dir support. RPCSEC_GSS/KRB5, TI-RPC (prod),  Early pNFS (alpha) ])
+AC_REVISION([Compiles:  i386/x86_64. FSAL: POSIX/PROXY/HPSS/FUSELIKE/LUSTRE/XFS/GPFS/PT/ZFS/VFS/CEPH .xattr ghost dir support. RPCSEC_GSS/KRB5, TI-RPC (prod),  Early pNFS (alpha) ])
 
 # Init Automake
 #AM_INIT_AUTOMAKE([-Wall -Werror foreign])
@@ -250,7 +250,7 @@ fi
 AM_CONDITIONAL(USE_UPCALL_SIMULATOR, test "$enable_upcall_simulator" = "yes")
 
 # FSAL switch argument (default is PROXY)
-AC_ARG_WITH( [fsal], AS_HELP_STRING([--with-fsal=HPSS|POSIX|PROXY|SNMP|FUSE|LUSTRE|XFS|GPFS|ZFS|VFS|CEPH|DYNFSAL|SHOOK (default=PROXY)],
+AC_ARG_WITH( [fsal], AS_HELP_STRING([--with-fsal=HPSS|POSIX|PROXY|SNMP|FUSE|LUSTRE|XFS|GPFS|PT|ZFS|VFS|CEPH|DYNFSAL|SHOOK (default=PROXY)],
              [specify the type of filesystem to be exported] ), FSAL="$withval", FSAL="PROXY")
 
 # exporting USE_FSAL_... for conditional compilation
@@ -262,6 +262,7 @@ AM_CONDITIONAL(USE_FSAL_LUSTRE,   test "$FSAL" = "LUSTRE")
 AM_CONDITIONAL(USE_FSAL_SHOOK,    test "$FSAL" = "SHOOK") # variant of Lustre FSAL
 AM_CONDITIONAL(USE_FSAL_XFS,      test "$FSAL" = "XFS")
 AM_CONDITIONAL(USE_FSAL_GPFS,     test "$FSAL" = "GPFS")
+AM_CONDITIONAL(USE_FSAL_PT,       test "$FSAL" = "PT")
 AM_CONDITIONAL(USE_FSAL_CEPH,     test "$FSAL" = "CEPH")
 AM_CONDITIONAL(USE_FSAL_TEMPLATE, test "$FSAL" = "TEMPLATE")
 AM_CONDITIONAL(SHARED_FSAL,       test "$FSAL" = "DYNFSAL")
@@ -682,12 +683,83 @@ case $FSAL in
 		FSAL_LIB="\$(top_builddir)/FSAL/FSAL_GPFS/libfsalgpfs.la"
 		FS_NAME="gpfs"
 		;;
-	VFS)
-		AC_DEFINE([_USE_VFS], 1, [GANESHA exports VFS Filesystem (kernel is >= 2.6.39])
+	PT)
+		# Test for GPFS rpms
+		gpfs_rpm=`rpm -qa | grep gpfs.base`
+		if test "x$gpfs_rpm" == "x" ; then
+		   	# Copy the header files and library to the right place
+		   	AC_MSG_NOTICE([PT/GPFS rpms are not installed])
+			mkdir -p /usr/lpp/mmfs/
+			cp -r ./FSAL/FSAL_PT/include/ /usr/lpp/mmfs/
+			cp -r ./FSAL/FSAL_PT/lib/ /usr/lpp/mmfs/
+			ln -s /usr/lpp/mmfs/include/gpfs.h /usr/include/
+			ln -s /usr/lpp/mmfs/include/gpfs.h /usr/include/gpfs_gpl.h
+			ln -s /usr/lpp/mmfs/include/gpfs_nfs.h /usr/include/
+			ln -s /usr/lpp/mmfs/include/gpfs_fcntl.h /usr/include/
+			ln -s /usr/lpp/mmfs/include/gpfs_lweTypes.h /usr/include/
+			ln -s /usr/lpp/mmfs/lib/i386/libgpfs.so /usr/lib/
+			ln -s /usr/lpp/mmfs/lib/libgpfs.so /usr/lib64/
+		else
+			AC_MSG_NOTICE([GPFS rpms are installed])
+		fi
+
+		AC_DEFINE([_USE_PT], 1, [GANESHA exports PT/GPFS Filesystem])
+		AC_DEFINE(_USE_FSAL_UP,1,[enable FSAL Upcall Interface support])
+
+
+		AC_CHECK_HEADERS([gpfs.h gpfs_fcntl.h gpfs_gpl.h gpfs_lweTypes.h],
+				 [],
+				 [AC_MSG_ERROR(missing gpfs include files)],
+				 [])
+		AC_CHECK_HEADERS([gpfs_nfs.h], [], [AC_MSG_ERROR(missing gpfs include files)], [
+                #include <fcntl.h>
+		#include <stdint.h>
+                ])
+
+                AC_CHECK_MEMBER([struct file_handle.f_handle], [
+                                        AC_DEFINE([_GPFS_DECLARES_HANDLE], 1, [GPFS declares the handle structure])
+                                      ],
+                                      [],
+                                      [
+                                        #include <fcntl.h>
+					#include <stdint.h>
+                                        #include <gpfs_nfs.h>
+                                      ])
+
+		AC_CHECK_DECL([gpfs_ganesha], [], [AC_MSG_ERROR(missing gpfs_ganesha function)], [
+                  #include <fcntl.h>
+  		  #include <stdint.h>
+                  #include <gpfs_nfs.h>
+                ])
+
+		AC_CHECK_DECLS([OPENHANDLE_NAME_TO_HANDLE,
+                                OPENHANDLE_OPEN_BY_HANDLE,
+                                OPENHANDLE_LINK_BY_FD,
+		                OPENHANDLE_READLINK_BY_FD,
+                                OPENHANDLE_STAT_BY_HANDLE,
+                                OPENHANDLE_GET_LOCK,
+                                OPENHANDLE_SET_LOCK,
+                                XATTR_STAT,
+                                XATTR_MODE,
+                                XATTR_UID,
+                                XATTR_GID,
+                                XATTR_ATIME_SET,
+                                XATTR_MTIME_SET,
+                                XATTR_ACL
+                                ],
+		               [],
+		               [AC_MSG_ERROR(GPFS < 3.5.0 found, you must upgrade GPFS to use this feature)],
+		               [
+                                 #include <fcntl.h>
+				 #include <stdint.h>
+                                 #include <gpfs_nfs.h>
+                               ])
+
+		AC_CHECK_LIB([gpfs], [gpfs_ganesha], [], [AC_MSG_ERROR(missing gpfs library)])
 		FSAL_CFLAGS=
-                FSAL_LDFLAGS=""
-		FSAL_LIB="\$(top_builddir)/FSAL/FSAL_VFS/libfsalvfs.la"
-		FS_NAME="vfs"
+		FSAL_LDFLAGS=""
+		FSAL_LIB="\$(top_builddir)/FSAL/FSAL_PT/libfsalpt.la"
+		FS_NAME="pt"
 		;;
         ZFS)
                 AC_DEFINE([_USE_ZFS], 1, [GANESHA exports ZFS Filesystem])
@@ -909,6 +981,7 @@ AC_CONFIG_FILES([include/Makefile
                  include/FSAL/FSAL_LUSTRE/Makefile
                  include/FSAL/FSAL_XFS/Makefile
                  include/FSAL/FSAL_GPFS/Makefile
+                 include/FSAL/FSAL_PT/Makefile
                  include/FSAL/FSAL_ZFS/Makefile
                  include/FSAL/FSAL_VFS/Makefile
                  include/FSAL/FSAL_TEMPLATE/Makefile
@@ -961,6 +1034,7 @@ AC_CONFIG_FILES([include/Makefile
 		 FSAL/FSAL_LUSTRE/Makefile
 		 FSAL/FSAL_XFS/Makefile
 		 FSAL/FSAL_GPFS/Makefile
+		 FSAL/FSAL_PT/Makefile
                  FSAL/FSAL_ZFS/Makefile
                  FSAL/FSAL_VFS/Makefile
 		 FSAL/FSAL_TEMPLATE/Makefile

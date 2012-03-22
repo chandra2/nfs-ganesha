@@ -625,7 +625,7 @@ int parseAccessParam(char *var_name, char *var_value,
 
 bool_t fsal_specific_checks(exportlist_t *p_entry)
 {
-  #ifdef _USE_GPFS
+  #if defined(_USE_GPFS) || defined (_USE_PT)
   p_entry->use_fsal_up = TRUE;
 
   if (strncmp(p_entry->fsal_up_type, "DUMB", 4) != 0)
