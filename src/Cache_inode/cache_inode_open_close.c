@@ -416,7 +416,7 @@ cache_inode_status_t cache_inode_close(cache_entry_t * pentry,
 {
   fsal_status_t fsal_status;
 
-  if((pentry == NULL) || (pclient == NULL) || (pstatus == NULL))
+  if((pentry == NULL) || (pstatus == NULL))
     return CACHE_CONTENT_INVALID_ARGUMENT;
 
   if(pentry->internal_md.type != REGULAR_FILE)
@@ -438,8 +438,7 @@ cache_inode_status_t cache_inode_close(cache_entry_t * pentry,
       *pstatus = CACHE_INODE_SUCCESS; /** @todo : PhD : May be CACHE_INODE_STATE_CONFLICTS would be better ? */
       return *pstatus;
     }
-
-  if((pclient->use_fd_cache == 0) ||
+  if((pclient == NULL) || (pclient->use_fd_cache == 0) ||
      (time(NULL) - pentry->object.file.open_fd.last_op > pclient->retention) ||
      (pentry->object.file.open_fd.fileno > (int)(pclient->max_fd)))
     {
@@ -450,7 +449,8 @@ cache_inode_status_t cache_inode_close(cache_entry_t * pentry,
                (int)(time(NULL) - pentry->object.file.open_fd.last_op));
 
 #ifdef _USE_MFSL
-      fsal_status = MFSL_close(&(pentry->object.file.open_fd.mfsl_fd), &pclient->mfsl_context, NULL);
+      fsal_status = MFSL_close(&(pentry->object.file.open_fd.mfsl_fd),
+                     (pclient != NULL) ? &pclient->mfsl_context : NULL, NULL);
 #else
       fsal_status = FSAL_close(&(pentry->object.file.open_fd.fd));
 #endif
