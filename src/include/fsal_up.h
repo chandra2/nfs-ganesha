@@ -45,6 +45,7 @@
 #define FSAL_UP_EVENT_CLOSE      10
 #define FSAL_UP_EVENT_SETATTR    11
 #define FSAL_UP_EVENT_INVALIDATE 12
+#define FSAL_UP_EVENT_FD_CLOSE   13
 
 typedef struct fsal_up_filter_list_t_
 {
@@ -163,6 +164,7 @@ typedef struct fsal_up_event_functions__
   fsal_status_t (*fsal_up_close) (fsal_up_event_data_t * pevdata );
   fsal_status_t (*fsal_up_setattr) (fsal_up_event_data_t * pevdata );
   fsal_status_t (*fsal_up_invalidate) (fsal_up_event_data_t * pevdata );
+  fsal_status_t (*fsal_up_fd_close) (fsal_up_event_data_t * pevdata );
 } fsal_up_event_functions_t;
 
 #define FSAL_UP_DUMB_TYPE "DUMB"
