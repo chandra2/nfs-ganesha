@@ -148,7 +148,7 @@ fsal_status_t GPFSFSAL_lock_op( fsal_file_t       * p_file_descriptor, /* IN */
 
   errno = 0;
 
-  retval = gpfs_ganesha(lock_op == FSAL_OP_LOCKT ?
+  retval = gpfs_ganesha1(lock_op == FSAL_OP_LOCKT ?
       OPENHANDLE_GET_LOCK : OPENHANDLE_SET_LOCK, &gpfs_sg_arg);
 
   if(retval)
@@ -160,7 +160,7 @@ fsal_status_t GPFSFSAL_lock_op( fsal_file_t       * p_file_descriptor, /* IN */
         {
           int retval2;
           glock_args.cmd = F_GETLK;
-          retval2 = gpfs_ganesha(OPENHANDLE_GET_LOCK, &gpfs_sg_arg);
+          retval2 = gpfs_ganesha1(OPENHANDLE_GET_LOCK, &gpfs_sg_arg);
           if(retval2)
             {
               LogCrit(COMPONENT_FSAL,

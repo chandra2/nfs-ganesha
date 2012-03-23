@@ -461,6 +461,44 @@ fsal_status_t fsal_internal_handle2fd(fsal_op_context_t * p_context,
   ReturnCode(ERR_FSAL_NO_ERROR, 0);
 }
 
+char *debug_arr[] = {
+	"OPENHANDLE_NAME_TO_HANDLE",
+	"OPENHANDLE_OPEN_BY_HANDLE",
+	"OPENHANDLE_LINK_BY_FD",
+	"OPENHANDLE_READLINK_BY_FD",
+	"OPENHANDLE_STAT_BY_HANDLE",
+	"OPENHANDLE_LAYOUT_TYPE",
+	"OPENHANDLE_GET_DEVICEINFO",
+	"OPENHANDLE_GET_DEVICELIST",
+	"OPENHANDLE_LAYOUT_GET",
+	"OPENHANDLE_LAYOUT_RETURN",
+	"OPENHANDLE_INODE_UPDATE",
+	"OPENHANDLE_GET_XSTAT",
+	"OPENHANDLE_SET_XSTAT",
+	"OPENHANDLE_CHECK_ACCESS",
+	"OPENHANDLE_OPEN_SHARE_BY_HANDLE",
+	"OPENHANDLE_GET_LOCK",
+	"OPENHANDLE_SET_LOCK",
+	"OPENHANDLE_THREAD_UPDATE",
+	"OPENHANDLE_LAYOUT_COMMIT",
+	"OPENHANDLE_DS_READ",
+	"OPENHANDLE_DS_WRITE",
+	"OPENHANDLE_GET_VERIFIER",
+	"OPENHANDLE_FSYNC",
+	"OPENHANDLE_SHARE_RESERVE",
+	"OPENHANDLE_GET_NODEID"
+};
+
+int gpfs_ganesha1(int op, void *oarg)
+{
+	int ret;
+
+	LogTest("Enter(%s)", debug_arr[op - OPENHANDLE_NAME_TO_HANDLE]);
+	ret = gpfs_ganesha(op, oarg);
+	LogTest("Exit (%d)", ret);
+	return ret;
+}
+
 /**
  * fsal_internal_handle2fd_at:
  * Open a file by handle from in an open directory
@@ -490,7 +528,7 @@ fsal_status_t fsal_internal_handle2fd_at(int dirfd,
   oarg.handle = (struct gpfs_file_handle *) &((gpfsfsal_handle_t *)phandle)->data.handle;
   oarg.flags = oflags;
 
-  rc = gpfs_ganesha(OPENHANDLE_OPEN_BY_HANDLE, &oarg);
+  rc = gpfs_ganesha1(OPENHANDLE_OPEN_BY_HANDLE, &oarg);
 
   if(rc < 0)
     ReturnCode(posix2fsal_error(errno), errno);
@@ -537,7 +575,7 @@ fsal_status_t fsal_internal_get_handle(fsal_op_context_t * p_context,   /* IN */
                "Lookup handle for %s",
                p_fsalpath->path);
 
-  rc = gpfs_ganesha(OPENHANDLE_NAME_TO_HANDLE, &harg);
+  rc = gpfs_ganesha1(OPENHANDLE_NAME_TO_HANDLE, &harg);
 
   if(rc < 0)
     ReturnCode(posix2fsal_error(errno), errno);
@@ -584,7 +622,7 @@ fsal_status_t fsal_internal_get_handle_at(int dfd,      /* IN */
                "Lookup handle at for %s",
                p_fsalname->name);
 
-  rc = gpfs_ganesha(OPENHANDLE_NAME_TO_HANDLE, &harg);
+  rc = gpfs_ganesha1(OPENHANDLE_NAME_TO_HANDLE, &harg);
 
   if(rc < 0)
     ReturnCode(posix2fsal_error(errno), errno);
@@ -626,7 +664,7 @@ fsal_status_t fsal_internal_fd2handle(int fd, fsal_handle_t * handle)
                "Lookup handle by fd for %d",
                fd);
 
-  rc = gpfs_ganesha(OPENHANDLE_NAME_TO_HANDLE, &harg);
+  rc = gpfs_ganesha1(OPENHANDLE_NAME_TO_HANDLE, &harg);
 
   if(rc < 0)
     ReturnCode(posix2fsal_error(errno), errno);
@@ -659,7 +697,7 @@ fsal_status_t fsal_internal_link_at(int srcfd, int dirfd, char *name)
   linkarg.file_fd = srcfd;
   linkarg.name = name;
 
-  rc = gpfs_ganesha(OPENHANDLE_LINK_BY_FD, &linkarg);
+  rc = gpfs_ganesha1(OPENHANDLE_LINK_BY_FD, &linkarg);
 
   if(rc < 0)
     ReturnCode(posix2fsal_error(errno), errno);
@@ -694,7 +732,7 @@ fsal_status_t fsal_readlink_by_handle(fsal_op_context_t * p_context,
   readlinkarg.buffer = __buf;
   readlinkarg.size = maxlen;
 
-  rc = gpfs_ganesha(OPENHANDLE_READLINK_BY_FD, &readlinkarg);
+  rc = gpfs_ganesha1(OPENHANDLE_READLINK_BY_FD, &readlinkarg);
 
   close(fd);
 
@@ -816,7 +854,7 @@ fsal_status_t fsal_stat_by_handle(fsal_op_context_t * p_context,
   statarg.handle = (struct gpfs_file_handle *) &((gpfsfsal_handle_t *)p_handle)->data.handle;
   statarg.buf = buf;
 
-  rc = gpfs_ganesha(OPENHANDLE_STAT_BY_HANDLE, &statarg);
+  rc = gpfs_ganesha1(OPENHANDLE_STAT_BY_HANDLE, &statarg);
 
   if(rc < 0)
     ReturnCode(posix2fsal_error(errno), errno);
@@ -867,7 +905,7 @@ xstatarg.attr_valid = XATTR_STAT;
   xstatarg.attr_changed = 0;
   xstatarg.buf = &p_buffxstat->buffstat;
 
-  rc = gpfs_ganesha(OPENHANDLE_GET_XSTAT, &xstatarg);
+  rc = gpfs_ganesha1(OPENHANDLE_GET_XSTAT, &xstatarg);
   LogDebug(COMPONENT_FSAL, "gpfs_ganesha: GET_XSTAT returned, rc = %d", rc);
 
   if(rc < 0)
@@ -920,7 +958,7 @@ fsal_status_t fsal_set_xstat_by_handle(fsal_op_context_t * p_context,
   xstatarg.attr_changed = attr_changed;
   xstatarg.buf = &p_buffxstat->buffstat;
 
-  rc = gpfs_ganesha(OPENHANDLE_SET_XSTAT, &xstatarg);
+  rc = gpfs_ganesha1(OPENHANDLE_SET_XSTAT, &xstatarg);
   LogDebug(COMPONENT_FSAL, "gpfs_ganesha: SET_XSTAT returned, rc = %d", rc);
 
   if(rc < 0)
@@ -1331,7 +1369,7 @@ static fsal_status_t fsal_check_access_by_handle(fsal_op_context_t * p_context, 
   if(isFullDebug(COMPONENT_FSAL))
     fsal_print_v4mask(v4mask);
 
-  rc = gpfs_ganesha(OPENHANDLE_CHECK_ACCESS, &accessarg);
+  rc = gpfs_ganesha1(OPENHANDLE_CHECK_ACCESS, &accessarg);
   LogDebug(COMPONENT_FSAL, "gpfs_ganesha: CHECK_ACCESS returned, rc = %d", rc);
 
   if(rc < 0)

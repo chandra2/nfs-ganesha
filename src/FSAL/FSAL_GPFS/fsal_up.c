@@ -88,7 +88,7 @@ fsal_status_t GPFSFSAL_UP_GetEvents( fsal_up_event_t ** pevents,                
   callback.buf = &buf;
   callback.fl = &fl;
 
-  rc = gpfs_ganesha(OPENHANDLE_INODE_UPDATE, &callback);
+  rc = gpfs_ganesha1(OPENHANDLE_INODE_UPDATE, &callback);
   LogDebug(COMPONENT_FSAL,
            "inode update: rc %d reason %d update ino %ld",
            rc, reason, callback.buf->st_ino);
