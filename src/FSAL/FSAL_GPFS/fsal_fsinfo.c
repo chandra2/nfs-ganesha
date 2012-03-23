@@ -45,6 +45,7 @@ fsal_status_t GPFSFSAL_dynamic_fsinfo(fsal_handle_t * p_filehandle, /* IN */
 {
   struct statvfs buffstatvfs;
   int rc, errsv;
+  LogTest("Enter");
   /* sanity checks. */
   if(!p_filehandle || !p_dynamicinfo || !p_context)
     Return(ERR_FSAL_FAULT, 0, INDEX_FSAL_dynamic_fsinfo);

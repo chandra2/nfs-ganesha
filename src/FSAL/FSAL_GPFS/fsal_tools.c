@@ -70,25 +70,32 @@ int GPFSFSAL_handlecmp(fsal_handle_t * handle_1, fsal_handle_t * handle_2,
 {
   gpfsfsal_handle_t *handle1 = (gpfsfsal_handle_t *)handle_1;
   gpfsfsal_handle_t *handle2 = (gpfsfsal_handle_t *)handle_2;
+  int ret = 0;
 
+  LogTest("Enter");
   *status = FSAL_STATUS_NO_ERROR;
 
   if(!handle1 || !handle2)
     {
       status->major = ERR_FSAL_FAULT;
-      return -1;
+      ret = -1;
+      goto done;
     }
 
-  if(handle1->data.handle.handle_size != handle2->data.handle.handle_size)
-    return -2;
+  if(handle1->data.handle.handle_size != handle2->data.handle.handle_size) {
+    ret = -2;
+    goto done;
+  }
 
   if(memcmp
      (handle1->data.handle.f_handle, handle2->data.handle.f_handle, handle1->data.handle.handle_key_size))
     //FSF && (handle1->fsid[0] == handle2->fsid[0])
     //FSF && (handle1->fsid[1] == handle2->fsid[1]) )
-    return -3;
+    ret = -3;
 
-  return 0;
+done:
+  LogTest("Exit(%d)", ret);
+  return ret;
 }
 
 /**
@@ -114,6 +121,7 @@ unsigned int GPFSFSAL_Handle_to_HashIndex(fsal_handle_t * handle,
   unsigned int mod;
   gpfsfsal_handle_t *p_handle = (gpfsfsal_handle_t *)handle;
 
+  LogTest("Enter");
   /* XXX If the handle is not 32 bits-aligned, the last loop will get uninitialized
    * chars after the end of the handle. We must avoid this by skipping the last loop
    * and doing a special processing for the last bytes */
@@ -140,6 +148,7 @@ unsigned int GPFSFSAL_Handle_to_HashIndex(fsal_handle_t * handle,
       sum = (3 * sum + 5 * extract + 1999) % index_size;
     }
 
+  LogTest("Exit(%d)", sum);
   return sum;
 }
 
@@ -163,6 +172,7 @@ unsigned int GPFSFSAL_Handle_to_RBTIndex(fsal_handle_t * handle, unsigned int co
   unsigned int mod;
   gpfsfsal_handle_t * p_handle = (gpfsfsal_handle_t *)handle;
 
+  LogTest("Enter");
   h = cookie;
 
   /* XXX If the handle is not 32 bits-aligned, the last loop will get uninitialized
@@ -190,6 +200,7 @@ unsigned int GPFSFSAL_Handle_to_RBTIndex(fsal_handle_t * handle, unsigned int co
       h = (857 * h ^ extract) % 715827883;
     }
 
+  LogTest("Exit(%u)", h);
   return h;
 }
 
@@ -218,6 +229,7 @@ fsal_status_t GPFSFSAL_DigestHandle(fsal_export_context_t *exp_context,   /* IN 
   gpfsfsal_export_context_t * p_expcontext = (gpfsfsal_export_context_t *)exp_context;
   gpfsfsal_handle_t * p_in_fsal_handle = (gpfsfsal_handle_t *)in_handle;
 
+  LogTest("Enter");
   /* sanity checks */
   if(!p_in_fsal_handle || !out_buff || !p_expcontext)
     ReturnCode(ERR_FSAL_FAULT, 0);
@@ -310,6 +322,7 @@ fsal_status_t GPFSFSAL_ExpandHandle(fsal_export_context_t *exp_context,   /* IN 
   gpfsfsal_export_context_t * p_expcontext = (gpfsfsal_export_context_t *)exp_context;
   gpfsfsal_handle_t * p_out_fsal_handle = (gpfsfsal_handle_t *)out_handle;
 
+  LogTest("Enter");
   /* sanity checks */
   if(!p_out_fsal_handle || !in_buff || !p_expcontext)
     ReturnCode(ERR_FSAL_FAULT, 0);
@@ -356,6 +369,7 @@ fsal_status_t GPFSFSAL_ExpandHandle(fsal_export_context_t *exp_context,   /* IN 
 fsal_status_t GPFSFSAL_SetDefault_FS_specific_parameter(fsal_parameter_t * out_parameter)
 {
   /* defensive programming... */
+  LogTest("Enter");
   if(out_parameter == NULL)
     ReturnCode(ERR_FSAL_FAULT, 0);
 
@@ -418,6 +432,7 @@ fsal_status_t GPFSFSAL_load_FS_specific_parameter_from_conf(config_file_t in_con
   gpfsfs_specific_initinfo_t *initinfo
 	  = (gpfsfs_specific_initinfo_t *) &out_parameter->fs_specific_info;
 
+  LogTest("Enter");
   block = config_FindItemByName(in_config, CONF_LABEL_FS_SPECIFIC);
 
   /* cannot read item */

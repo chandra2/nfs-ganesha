@@ -70,6 +70,7 @@ fsal_status_t GPFSFSAL_create(fsal_handle_t * p_parent_directory_handle,    /* I
   /* sanity checks.
    * note : object_attributes is optional.
    */
+  LogTest("Enter");
   if(!p_parent_directory_handle || !p_context || !p_object_handle || !p_filename)
     Return(ERR_FSAL_FAULT, 0, INDEX_FSAL_create);
 
@@ -245,6 +246,7 @@ fsal_status_t GPFSFSAL_mkdir(fsal_handle_t * p_parent_directory_handle,     /* I
   fsal_accessflags_t access_mask = 0;
   fsal_attrib_list_t parent_dir_attrs;
 
+  LogTest("Enter");
   /* sanity checks.
    * note : object_attributes is optional.
    */
@@ -413,6 +415,7 @@ fsal_status_t GPFSFSAL_link(fsal_handle_t * p_target_handle,        /* IN */
   fsal_accessflags_t access_mask = 0;
   fsal_attrib_list_t parent_dir_attrs;
 
+  LogTest("Enter");
   /* sanity checks.
    * note : attributes is optional.
    */
@@ -526,6 +529,7 @@ fsal_status_t GPFSFSAL_mknode(fsal_handle_t * parentdir_handle,     /* IN */
   fsal_accessflags_t access_mask = 0;
   fsal_attrib_list_t parent_dir_attrs;
 
+  LogTest("Enter");
   /* sanity checks.
    * note : link_attributes is optional.
    */

@@ -78,6 +78,7 @@ fsal_status_t GPFSFSAL_test_access(fsal_op_context_t * p_context,   /* IN */
     )
 {
   fsal_status_t status;
+  LogTest("Enter");
   status = fsal_internal_testAccess(p_context, access_type, NULL, p_object_attributes);
   Return(status.major, status.minor, INDEX_FSAL_test_access);
 }

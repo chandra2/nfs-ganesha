@@ -35,12 +35,16 @@ void GPFSFSAL_get_stats(fsal_statistics_t * stats,  /* OUT */
     )
 {
 
+  LogTest("Enter");
   /* sanity check. */
-  if(!stats)
+  if(!stats) {
+    LogTest("Exit");
     return;
+  }
 
   /* returns stats for this thread. */
   fsal_internal_getstats(stats);
 
+  LogTest("Exit");
   return;
 }

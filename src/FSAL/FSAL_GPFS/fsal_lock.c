@@ -74,6 +74,7 @@ fsal_status_t GPFSFSAL_lock_op( fsal_file_t       * p_file_descriptor, /* IN */
   gpfsfsal_op_context_t *gpfs_op_cxt = (gpfsfsal_op_context_t *)p_context;
   gpfsfsal_file_t * pfd = (gpfsfsal_file_t *) p_file_descriptor;
 
+  LogTest("Enter");
   if(p_file_descriptor == NULL)
     {
       LogDebug(COMPONENT_FSAL, "p_file_descriptor arg is NULL.");

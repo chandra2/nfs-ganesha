@@ -40,12 +40,14 @@
 fsal_status_t GPFSFSAL_UP_Init( fsal_up_event_bus_parameter_t * pebparam,      /* IN */
                                    fsal_up_event_bus_context_t * pupebcontext     /* OUT */)
 {
+  LogTest("Enter");
   Return(ERR_FSAL_NO_ERROR, 0, INDEX_FSAL_UP_init);
 }
 
 fsal_status_t GPFSFSAL_UP_AddFilter( fsal_up_event_bus_filter_t * pupebfilter,  /* IN */
                                         fsal_up_event_bus_context_t * pupebcontext /* INOUT */ )
 {
+  LogTest("Enter");
   Return(ERR_FSAL_NO_ERROR, 0, INDEX_FSAL_UP_addfilter);
 }
 
@@ -64,6 +66,7 @@ fsal_status_t GPFSFSAL_UP_GetEvents( fsal_up_event_t ** pevents,                
   int reason = 0;
   unsigned int *fhP;
 
+  LogTest("Enter");
   if (pupebcontext == NULL || event_nb == NULL)
     {
       LogDebug(COMPONENT_FSAL, "Error: GPFSFSAL_UP_GetEvents() received"

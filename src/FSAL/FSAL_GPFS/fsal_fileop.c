@@ -88,6 +88,7 @@ fsal_status_t GPFSFSAL_open_by_name(fsal_handle_t * dirhandle,      /* IN */
   fsal_status_t fsal_status;
   fsal_handle_t filehandle;
 
+  LogTest("Enter");
   if(!dirhandle || !filename || !p_context || !file_descriptor)
     Return(ERR_FSAL_FAULT, 0, INDEX_FSAL_open_by_name);
 
@@ -143,6 +144,7 @@ fsal_status_t GPFSFSAL_open(fsal_handle_t * p_filehandle,   /* IN */
   int posix_flags = 0;
   gpfsfsal_file_t * p_file_descriptor = (gpfsfsal_file_t *)file_desc;
 
+  LogTest("Enter");
   /* sanity checks.
    * note : file_attributes is optional.
    */
@@ -229,6 +231,7 @@ fsal_status_t GPFSFSAL_read(fsal_file_t * file_desc,        /* IN */
 
   /* sanity checks. */
 
+  LogTest("Enter");
   if(!p_file_descriptor || !buffer || !p_read_amount || !p_end_of_file)
     Return(ERR_FSAL_FAULT, 0, INDEX_FSAL_read);
 
@@ -343,6 +346,7 @@ fsal_status_t GPFSFSAL_write(fsal_file_t * file_desc,       /* IN */
   int pcall = FALSE;
   gpfsfsal_file_t * p_file_descriptor = (gpfsfsal_file_t *)file_desc;
 
+  LogTest("Enter");
   /* sanity checks. */
   if(!p_file_descriptor || !buffer || !p_write_amount)
     Return(ERR_FSAL_FAULT, 0, INDEX_FSAL_write);
@@ -474,6 +478,7 @@ fsal_status_t GPFSFSAL_close(fsal_file_t * p_file_descriptor        /* IN */
 
   int rc, errsv;
 
+  LogTest("Enter");
   /* sanity checks. */
   if(!p_file_descriptor)
     Return(ERR_FSAL_FAULT, 0, INDEX_FSAL_close);
@@ -522,6 +527,7 @@ fsal_status_t GPFSFSAL_commit( fsal_file_t * p_file_descriptor,
 {
   int rc, errsv;
 
+  LogTest("Enter");
   /* sanity checks. */
   if(!p_file_descriptor)
     Return(ERR_FSAL_FAULT, 0, INDEX_FSAL_commit);

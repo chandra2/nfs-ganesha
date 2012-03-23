@@ -78,6 +78,7 @@ fsal_status_t GPFSFSAL_truncate(fsal_handle_t * p_filehandle,       /* IN */
   int fd;
   fsal_status_t st;
 
+  LogTest("Enter");
   /* sanity checks.
    * note : object_attributes is optional.
    */

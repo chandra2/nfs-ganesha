@@ -83,6 +83,7 @@ fsal_status_t GPFSFSAL_access(fsal_handle_t * p_object_handle,      /* IN */
   /* sanity checks.
    * note : object_attributes is optionnal in GPFSFSAL_getattrs.
    */
+  LogTest("Enter");
   if(!p_object_handle || !p_context)
     Return(ERR_FSAL_FAULT, 0, INDEX_FSAL_access);
 

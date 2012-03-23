@@ -81,7 +81,7 @@ fsal_status_t GPFSFSAL_getattrs(fsal_handle_t * p_filehandle,       /* IN */
 #ifdef _USE_NFS4_ACL
   fsal_accessflags_t access_mask = 0;
 #endif
-
+  LogTest("Enter");
   /* sanity checks.
    * note : object_attributes is mandatory in GPFSFSAL_getattrs.
    */
@@ -201,6 +201,7 @@ fsal_status_t GPFSFSAL_setattrs(fsal_handle_t * p_filehandle,       /* IN */
   fsal_accessflags_t access_mask = 0;
   fsal_attrib_list_t wanted_attrs, current_attrs;
 
+  LogTest("Enter");
   /* sanity checks.
    * note : object_attributes is optional.
    */

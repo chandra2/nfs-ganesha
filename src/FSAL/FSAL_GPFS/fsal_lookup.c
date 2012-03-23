@@ -84,6 +84,7 @@ fsal_status_t GPFSFSAL_lookup(fsal_handle_t * p_parent_directory_handle,    /* I
    * note : object_attributes is optional
    *        parent_directory_handle may be null for getting FS root.
    */
+  LogTest("Enter");
   if(!p_object_handle || !p_context)
     Return(ERR_FSAL_FAULT, 0, INDEX_FSAL_lookup);
 
@@ -227,6 +228,7 @@ fsal_status_t GPFSFSAL_lookupPath(fsal_path_t * p_path,     /* IN */
 {
   fsal_status_t status;
 
+  LogTest("Enter");
   /* sanity checks
    * note : object_attributes is optionnal.
    */
@@ -289,5 +291,6 @@ fsal_status_t GPFSFSAL_lookupJunction(fsal_handle_t * p_junction_handle,    /* I
                                   fsal_attrib_list_t * p_fsroot_attributes      /* [ IN/OUT ] */
     )
 {
+  LogTest("Enter");
   Return(ERR_FSAL_NO_ERROR, 0, INDEX_FSAL_lookupJunction);
 }

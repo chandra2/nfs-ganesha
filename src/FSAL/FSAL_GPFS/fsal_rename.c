@@ -92,6 +92,7 @@ fsal_status_t GPFSFSAL_rename(fsal_handle_t * p_old_parentdir_handle,       /* I
   fsal_accessflags_t access_mask = 0;
   fsal_attrib_list_t src_dir_attrs, tgt_dir_attrs;
 
+  LogTest("Enter");
   /* sanity checks.
    * note : src/tgt_dir_attributes are optional.
    */

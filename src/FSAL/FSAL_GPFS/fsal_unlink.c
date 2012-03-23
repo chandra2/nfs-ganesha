@@ -78,6 +78,7 @@ fsal_status_t GPFSFSAL_unlink(fsal_handle_t * p_parent_directory_handle,    /* I
   fsal_accessflags_t access_mask = 0;
   fsal_attrib_list_t parent_dir_attrs;
 
+  LogTest("Enter");
   /* sanity checks. */
   if(!p_parent_directory_handle || !p_context || !p_object_name)
     Return(ERR_FSAL_FAULT, 0, INDEX_FSAL_unlink);

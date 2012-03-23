@@ -43,6 +43,7 @@ fsal_status_t GPFSFSAL_BuildExportContext(fsal_export_context_t *export_context,
   fsal_op_context_t op_context;
   gpfsfsal_export_context_t *p_export_context = (gpfsfsal_export_context_t *)export_context;
 
+  LogTest("Enter");
   /* sanity check */
   if((p_export_context == NULL) || (p_export_path == NULL))
     {
@@ -133,6 +134,7 @@ fsal_status_t GPFSFSAL_BuildExportContext(fsal_export_context_t *export_context,
 
 fsal_status_t GPFSFSAL_CleanUpExportContext(fsal_export_context_t * p_export_context) 
 {
+  LogTest("Enter");
   if(p_export_context == NULL) 
   {
     LogCrit(COMPONENT_FSAL,

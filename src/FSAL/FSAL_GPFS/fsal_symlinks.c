@@ -75,6 +75,7 @@ fsal_status_t GPFSFSAL_readlink(fsal_handle_t * p_linkhandle,       /* IN */
   fsal_status_t status;
   char link_content_out[FSAL_MAX_PATH_LEN];
 
+  LogTest("Enter");
   /* sanity checks.
    * note : link_attributes is optional.
    */
@@ -167,6 +168,7 @@ fsal_status_t GPFSFSAL_symlink(fsal_handle_t * p_parent_directory_handle,   /* I
   fsal_accessflags_t access_mask = 0;
   fsal_attrib_list_t parent_dir_attrs;
 
+  LogTest("Enter");
   /* sanity checks.
    * note : link_attributes is optional.
    */

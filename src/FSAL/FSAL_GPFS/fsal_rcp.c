@@ -77,6 +77,7 @@ fsal_status_t GPFSFSAL_rcp(fsal_handle_t * filehandle,      /* IN */
   ssize_t local_size;
   fsal_size_t fs_size;
 
+  LogTest("Enter");
   /* sanity checks. */
 
   if(!filehandle || !p_context || !p_local_path)

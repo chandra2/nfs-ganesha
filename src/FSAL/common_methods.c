@@ -47,6 +47,7 @@ fsal_status_t COMMON_CleanUpExportContext_noerror(fsal_export_context_t * p_expo
 fsal_status_t COMMON_InitClientContext(fsal_op_context_t * p_thr_context)
 {
   /* sanity check */
+  LogTest("Enter");
   if(!p_thr_context)
     Return(ERR_FSAL_FAULT, 0, INDEX_FSAL_InitClientContext);
 
@@ -67,6 +68,7 @@ fsal_status_t COMMON_GetClientContext(fsal_op_context_t * p_thr_context,  /* IN/
   fsal_count_t ng = nb_alt_groups;
   unsigned int i;
 
+  LogTest("Enter");
   /* sanity check */
   if(!p_thr_context || !p_export_context ||
      ((ng > 0) && (alt_groups == NULL)))
@@ -130,6 +132,7 @@ fsal_status_t COMMON_setattr_access_notsupp(fsal_op_context_t * p_context,      
                                   fsal_attrib_list_t * object_attributes        /* IN */
     )
 {
+  LogTest("Enter");
   Return(ERR_FSAL_NOTSUPP, 0, INDEX_FSAL_setattr_access);
 }                               /* FSAL_test_setattr_access */
 
@@ -156,6 +159,7 @@ fsal_status_t COMMON_rename_access(fsal_op_context_t * pcontext,  /* IN */
 {
   fsal_status_t fsal_status;
 
+  LogTest("Enter");
   fsal_status = FSAL_test_access(pcontext, FSAL_W_OK, pattrsrc);
   if(FSAL_IS_ERROR(fsal_status))
     Return(fsal_status.major, fsal_status.minor, INDEX_FSAL_rename_access);
@@ -197,6 +201,7 @@ fsal_status_t COMMON_create_access(fsal_op_context_t * pcontext,  /* IN */
 {
   fsal_status_t fsal_status;
 
+  LogTest("Enter");
   fsal_status = FSAL_test_access(pcontext, FSAL_W_OK, pattr);
   if(FSAL_IS_ERROR(fsal_status))
     Return(fsal_status.major, fsal_status.minor, INDEX_FSAL_create_access);
@@ -224,6 +229,7 @@ fsal_status_t COMMON_unlink_access(fsal_op_context_t * pcontext,  /* IN */
 {
   fsal_status_t fsal_status;
 
+  LogTest("Enter");
   fsal_status = FSAL_test_access(pcontext, FSAL_W_OK, pattr);
   if(FSAL_IS_ERROR(fsal_status))
     Return(fsal_status.major, fsal_status.minor, INDEX_FSAL_unlink_access);
@@ -253,9 +259,10 @@ fsal_status_t COMMON_link_access(fsal_op_context_t * pcontext,    /* IN */
 {
   fsal_status_t fsal_status;
 
+  LogTest("Enter");
   fsal_status = FSAL_test_access(pcontext, FSAL_W_OK, pattr);
   if(FSAL_IS_ERROR(fsal_status))
-    Return(fsal_status.major, fsal_status.minor, INDEX_FSAL_unlink_access);
+    Return(fsal_status.major, fsal_status.minor, INDEX_FSAL_link_access);
 
   /* If this point is reached, then access is granted */
   Return(ERR_FSAL_NO_ERROR, 0, INDEX_FSAL_link_access);
@@ -280,6 +287,7 @@ fsal_status_t COMMON_merge_attrs(fsal_attrib_list_t * pinit_attr,
                                fsal_attrib_list_t * pnew_attr,
                                fsal_attrib_list_t * presult_attr)
 {
+  LogTest("Enter");
   if(pinit_attr == NULL || pnew_attr == NULL || presult_attr == NULL)
     Return(ERR_FSAL_INVAL, 0, INDEX_FSAL_merge_attrs);
 
@@ -553,6 +561,7 @@ fsal_status_t COMMON_check_quota( char              * pfsal_path,  /* IN */
 fsal_status_t COMMON_CleanObjectResources(fsal_handle_t * in_fsal_handle)
 {
 
+  LogTest("Enter");
   Return(ERR_FSAL_NO_ERROR, 0, INDEX_FSAL_CleanObjectResources);
 
 }
@@ -567,13 +576,15 @@ fsal_status_t COMMON_open_by_fileid(fsal_handle_t * filehandle,   /* IN */
                                   fsal_file_t * file_descriptor,        /* OUT */
                                   fsal_attrib_list_t * file_attributes /* [ IN/OUT ] */ )
 {
+  LogTest("Enter");
   Return(ERR_FSAL_NOTSUPP, 0, INDEX_FSAL_open_by_fileid);
 }
 
 fsal_status_t COMMON_close_by_fileid(fsal_file_t * file_descriptor /* IN */ ,
                                    fsal_u64_t fileid)
 {
-  Return(ERR_FSAL_NOTSUPP, 0, INDEX_FSAL_open_by_fileid);
+  LogTest("Enter");
+  Return(ERR_FSAL_NOTSUPP, 0, INDEX_FSAL_close_by_fileid);
 }
 
 fsal_status_t COMMON_rcp_by_fileid(fsal_handle_t * filehandle,    /* IN */
@@ -582,6 +593,7 @@ fsal_status_t COMMON_rcp_by_fileid(fsal_handle_t * filehandle,    /* IN */
                                  fsal_path_t * p_local_path,    /* IN */
                                  fsal_rcpflag_t transfer_opt /* IN */ )
 {
+  LogTest("Enter");
   Return(ERR_FSAL_NOTSUPP, 0, INDEX_FSAL_open_by_fileid);
 }
 
@@ -611,6 +623,7 @@ fsal_status_t COMMON_getextattrs_notsupp(fsal_handle_t * p_filehandle, /* IN */
                                    fsal_extattrib_list_t * p_object_attributes /* OUT */
     )
 {
+  LogTest("Enter");
   Return(ERR_FSAL_NOTSUPP, 0, INDEX_FSAL_getextattrs);
 }
 

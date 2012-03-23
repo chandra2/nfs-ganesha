@@ -200,6 +200,7 @@ fsal_status_t FSAL_Init(fsal_parameter_t * init_info    /* IN */
                (_struct_status_).major = (_code_) ;                            \
                (_struct_status_).minor = (_minor_) ;                           \
                fsal_increment_nbcall( _f_,_struct_status_ );                   \
+               LogTest("Exit(%d/%d)", _code_ , _minor_);                       \
                if(isDebug(COMPONENT_FSAL))                                     \
                  {                                                             \
                    if((_struct_status_).major != ERR_FSAL_NO_ERROR)            \
@@ -224,6 +225,7 @@ fsal_status_t FSAL_Init(fsal_parameter_t * init_info    /* IN */
                fsal_status_t _struct_status_ = FSAL_STATUS_NO_ERROR ;\
                (_struct_status_).major = (_code_) ;          \
                (_struct_status_).minor = (_minor_) ;         \
+               LogTest("Exit(%d/%d)", _code_ , _minor_);     \
                return (_struct_status_);                     \
               } while(0)
 

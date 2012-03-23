@@ -52,6 +52,7 @@ fsal_status_t GPFSFSAL_opendir(fsal_handle_t * p_dir_handle,        /* IN */
   fsal_attrib_list_t dir_attrs;
   gpfsfsal_dir_t *p_dir_descriptor = (gpfsfsal_dir_t *)dir_desc;
 
+  LogTest("Enter");
   /* sanity checks
    * note : dir_attributes is optionnal.
    */
@@ -169,6 +170,7 @@ fsal_status_t GPFSFSAL_readdir(fsal_dir_t * dir_desc,       /* IN */
 
   int rc = 0;
 
+  LogTest("Enter");
   memset(buff, 0, BUF_SIZE);
   memset(&entry_name, 0, sizeof(fsal_name_t));
 
@@ -316,6 +318,7 @@ fsal_status_t GPFSFSAL_closedir(fsal_dir_t * p_dir_descriptor       /* IN */
 
   int rc;
 
+  LogTest("Enter");
   /* sanity checks */
   if(!p_dir_descriptor)
     Return(ERR_FSAL_FAULT, 0, INDEX_FSAL_closedir);

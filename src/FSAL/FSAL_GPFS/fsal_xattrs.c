@@ -267,6 +267,7 @@ fsal_status_t GPFSFSAL_GetXAttrAttrs(fsal_handle_t * p_objecthandle,        /* I
   fsal_attrib_list_t file_attrs;
 #endif
 
+  LogTest("Enter");
   /* sanity checks */
   if(!p_objecthandle || !p_context || !p_attrs)
     Return(ERR_FSAL_FAULT, 0, INDEX_FSAL_GetXAttrAttrs);
@@ -336,6 +337,7 @@ fsal_status_t GPFSFSAL_ListXAttrs(fsal_handle_t * p_objecthandle,   /* IN */
   fsal_attrib_list_t file_attrs;
 #endif
 
+  LogTest("Enter");
   /* sanity checks */
   if(!p_objecthandle || !p_context || !xattrs_tab || !p_nb_returned || !end_of_list)
     Return(ERR_FSAL_FAULT, 0, INDEX_FSAL_ListXAttrs);
@@ -418,6 +420,7 @@ fsal_status_t GPFSFSAL_GetXAttrValueById(fsal_handle_t * p_objecthandle,    /* I
   if(!p_objecthandle || !p_context || !p_output_size || !buffer_addr)
     Return(ERR_FSAL_FAULT, 0, INDEX_FSAL_GetXAttrValue);
 
+  LogTest("Enter");
   /* check that this index match the type of entry */
   if(xattr_id >= XATTR_COUNT
      || !do_match_type(xattr_list[xattr_id].flags, p_objecthandle->handle.handle_type))
@@ -452,6 +455,7 @@ fsal_status_t GPFSFSAL_GetXAttrIdByName(fsal_handle_t * p_objecthandle,     /* I
   unsigned int index;
   int found = FALSE;
 
+  LogTest("Enter");
   /* sanity checks */
   if(!p_objecthandle || !xattr_name)
     Return(ERR_FSAL_FAULT, 0, INDEX_FSAL_GetXAttrValue);
@@ -500,6 +504,7 @@ fsal_status_t GPFSFSAL_GetXAttrValueByName(fsal_handle_t * p_objecthandle,  /* I
   unsigned int index;
 #endif
 
+  LogTest("Enter");
   /* sanity checks */
   if(!p_objecthandle || !p_context || !p_output_size || !buffer_addr || !xattr_name)
     Return(ERR_FSAL_FAULT, 0, INDEX_FSAL_GetXAttrValue);
@@ -531,6 +536,7 @@ fsal_status_t GPFSFSAL_SetXAttrValue(fsal_handle_t * p_objecthandle,        /* I
                                  int create     /* IN */
     )
 {
+  LogTest("Enter");
   Return(ERR_FSAL_PERM, 0, INDEX_FSAL_SetXAttrValue);
 }
 
@@ -541,6 +547,7 @@ fsal_status_t GPFSFSAL_SetXAttrValueById(fsal_handle_t * p_objecthandle,    /* I
                                      size_t buffer_size /* IN */
     )
 {
+  LogTest("Enter");
   Return(ERR_FSAL_PERM, 0, INDEX_FSAL_SetXAttrValue);
 }
 
