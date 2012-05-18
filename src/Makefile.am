@@ -177,6 +177,7 @@ EXTRA_DIST=nfs-ganesha.spec              \
            nfs-ganesha.shook.init        \
            nfs-ganesha.xfs.init          \
            nfs-ganesha.gpfs.init         \
+           nfs-ganesha.pt.init           \
            nfs-ganesha.vfs.init          \
            nfs-ganesha.hpss.init         \
            nfs-ganesha.proxy.init        \
@@ -190,6 +191,7 @@ EXTRA_DIST=nfs-ganesha.spec              \
            nfs-ganesha.lustre.sysconfig  \
            nfs-ganesha.shook.sysconfig   \
            nfs-ganesha.gpfs.sysconfig    \
+           nfs-ganesha.pt.sysconfig      \
            nfs-ganesha.posix.sysconfig   \
            nfs-ganesha.snmp.sysconfig    \
            nfs-ganesha.xfs.sysconfig     \
